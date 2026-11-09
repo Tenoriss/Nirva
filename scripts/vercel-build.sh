@@ -1,8 +1,13 @@
+
 #!/usr/bin/env bash
 set -euo pipefail
 
 flutter_dir="${HOME}/flutter"
 flutter_bin="$(command -v flutter || true)"
+
+# Fix Git dubious ownership on Vercel
+git config --global --add safe.directory "${flutter_dir}"
+
 if [ -z "${flutter_bin}" ] && [ ! -x "${flutter_dir}/bin/flutter" ]; then
   release_url="$(
     curl --fail --silent --show-error \
@@ -17,6 +22,7 @@ if [ -z "${flutter_bin}" ] && [ ! -x "${flutter_dir}/bin/flutter" ]; then
         });
       '
   )"
+
   mkdir -p "${HOME}"
   curl --fail --silent --show-error --location "${release_url}" | tar -xJ -C "${HOME}"
 fi
