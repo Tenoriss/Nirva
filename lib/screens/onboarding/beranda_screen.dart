@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
 import '../auth/login_screen.dart';
+import 'jelajah_screen.dart';
+import 'login_required_dialog.dart';
 
 class BerandaScreen extends StatefulWidget {
   const BerandaScreen({super.key});
@@ -776,7 +778,16 @@ class _BerandaScreenState extends State<BerandaScreen> {
                 setState(() => selectedTab = index);
 
                 if (index != 0) {
-                  showMessage('${labels[index]} akan segera tersedia.');
+                  if (index == 1) {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (_) => const JelajahScreen()),
+                    );
+                  } else if (index == 2) {
+                    showLoginRequiredDialog(context);
+                  } else {
+                    showMessage('${labels[index]} akan segera tersedia.');
+                  }
                 }
               },
               child: Column(

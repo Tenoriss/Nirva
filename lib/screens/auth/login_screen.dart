@@ -16,6 +16,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
 
   bool _obscurePassword = true;
+  bool _rememberMe = false;
 
   @override
   void dispose() {
@@ -39,9 +40,10 @@ class _LoginScreenState extends State<LoginScreen> {
       return;
     }
 
-    Navigator.pushReplacement(
+    Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (_) => const DashboardScreen()),
+      (route) => false,
     );
   }
 
@@ -182,8 +184,25 @@ class _LoginScreenState extends State<LoginScreen> {
                         return null;
                       },
                     ),
-
-                    const SizedBox(height: 28),
+                    const SizedBox(height: 12),
+                    Row(
+                      children: [
+                        Checkbox(
+                          value: _rememberMe,
+                          activeColor: primaryColor,
+                          onChanged: (value) {
+                            setState(() {
+                              _rememberMe = value ?? false;
+                            });
+                          },
+                        ),
+                        const Text(
+                          'Ingat saya',
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
 
                     SizedBox(
                       width: double.infinity,

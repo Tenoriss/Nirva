@@ -36,6 +36,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   audioplayers: ^6.1.0
   image_picker: ^1.1.2
+  mobile_scanner: ^5.2.3
 
 dev_dependencies:
   flutter_test:

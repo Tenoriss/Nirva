@@ -3,6 +3,8 @@ import '../../services/auth_service.dart';
 import '../auth/login_screen.dart';
 import 'insight_screen.dart';
 import 'nirva_ai_screen.dart';
+import 'cashier_screen.dart';
+import 'order_detail_screen.dart';
 import 'pesanan_screen.dart';
 import 'profil_screen.dart';
 
@@ -186,7 +188,23 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  void openCashierSheet({bool initialExpenseMode = false}) {
+  void openCashierSheet({
+    bool initialExpenseMode = false,
+    OrderItem? order,
+    bool startInLandscape = false,
+  }) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => CashierScreen(
+          order: order,
+          startInLandscape: startInLandscape,
+        ),
+      ),
+    );
+  }
+
+  void openCashierSheetLegacy({bool initialExpenseMode = false}) {
     final nameController = TextEditingController();
     final amountController = TextEditingController();
     String paymentMethod = 'Tunai';
@@ -655,7 +673,9 @@ class _DashboardScreenState extends State<DashboardScreen> {
               index: selectedIndex,
               children: [
                 buildHome(),
-                PesananScreen(onDataChanged: () => setState(() {})),
+                PesananScreen(
+                  onDataChanged: () => setState(() {}),
+                ),
                 const InsightScreen(),
                 ProfilScreen(
                   onLogout: logout,
@@ -911,7 +931,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
                 child: buildMainMenu(
                   Icons.storefront_outlined,
                   'Kasir',
-                  () => openCashierSheet(),
+                  () => openCashierSheet(startInLandscape: true),
                 ),
               ),
             ],
@@ -995,6 +1015,17 @@ class _DashboardScreenState extends State<DashboardScreen> {
                           transactions[i].name,
                           transactions[i].detail,
                           formatRupiah(transactions[i].amount),
+                          onTap: i < data.orders.length
+                              ? () => Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => OrderDetailScreen(
+                                      order: data.orders[i],
+                                      onDataChanged: () => setState(() {}),
+                                    ),
+                                  ),
+                                )
+                              : null,
                         ),
                       ],
                     ],
@@ -1088,52 +1119,64 @@ class _DashboardScreenState extends State<DashboardScreen> {
     );
   }
 
-  Widget buildTransaction(String name, String detail, String amount) {
-    return Row(
-      children: [
-        Container(
-          width: 38,
-          height: 38,
-          decoration: BoxDecoration(
-            color: const Color(0xFFEAF3E9),
-            borderRadius: BorderRadius.circular(11),
+  Widget buildTransaction(
+    String name,
+    String detail,
+    String amount, {
+    VoidCallback? onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Row(
+        children: [
+          Container(
+            width: 38,
+            height: 38,
+            decoration: BoxDecoration(
+              color: const Color(0xFFEAF3E9),
+              borderRadius: BorderRadius.circular(11),
+            ),
+            child: const Icon(
+              Icons.receipt_long_outlined,
+              color: green,
+              size: 20,
+            ),
           ),
-          child: const Icon(
-            Icons.receipt_long_outlined,
-            color: green,
-            size: 20,
-          ),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                name,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 13,
-                  color: darkGreen,
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  name,
+                  style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13,
+                    color: darkGreen,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 3),
-              Text(
-                detail,
-                style: const TextStyle(color: Color(0xFF708077), fontSize: 11),
-              ),
-            ],
+                const SizedBox(height: 3),
+                Text(
+                  detail,
+                  style: const TextStyle(
+                    color: Color(0xFF708077),
+                    fontSize: 11,
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
-        Text(
-          amount,
-          style: const TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.bold,
-            color: darkGreen,
+          Text(
+            amount,
+            style: const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+              color: darkGreen,
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 

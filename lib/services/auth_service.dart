@@ -50,6 +50,7 @@ class OrderItem {
   final String itemsSummary;
   final int totalAmount;
   bool isPaid;
+  final String notes;
 
   OrderItem({
     required this.id,
@@ -61,6 +62,7 @@ class OrderItem {
     required this.itemsSummary,
     required this.totalAmount,
     required this.isPaid,
+    this.notes = 'Sambal dipisah, ya.',
   });
 }
 

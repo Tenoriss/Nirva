@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import '../../services/auth_service.dart';
+import 'order_detail_screen.dart';
 
 class PesananScreen extends StatefulWidget {
   final VoidCallback? onDataChanged;
+  final VoidCallback? onProcessOrder;
 
-  const PesananScreen({super.key, this.onDataChanged});
+  const PesananScreen({super.key, this.onDataChanged, this.onProcessOrder});
 
   @override
   State<PesananScreen> createState() => _PesananScreenState();
@@ -274,184 +276,15 @@ class _PesananScreenState extends State<PesananScreen> {
     );
   }
 
-  void _openOrderDetailSheet(OrderItem order) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.white,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+  void _openOrderDetail(OrderItem order) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => OrderDetailScreen(
+          order: order,
+          onDataChanged: () => _notifyChanged(),
+        ),
       ),
-      builder: (sheetContext) {
-        return StatefulBuilder(
-          builder: (context, setSheetState) {
-            return Padding(
-              padding: const EdgeInsets.fromLTRB(20, 18, 20, 24),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    children: [
-                      Text(
-                        '${order.customerName} · ${order.orderNumber}',
-                        style: const TextStyle(
-                          fontSize: 19,
-                          fontWeight: FontWeight.bold,
-                          color: darkGreen,
-                        ),
-                      ),
-                      const Spacer(),
-                      _buildStatusBadge(order.status),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    '${order.time} · ${order.orderType}',
-                    style: const TextStyle(fontSize: 13, color: mutedText),
-                  ),
-                  const SizedBox(height: 14),
-                  Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(14),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFFF6F9F6),
-                      borderRadius: BorderRadius.circular(14),
-                      border: Border.all(color: cardBorder),
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          'Rincian Pesanan',
-                          style: TextStyle(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: mutedText,
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Text(
-                          order.itemsSummary,
-                          style: const TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600,
-                            color: darkGreen,
-                          ),
-                        ),
-                        const Divider(height: 20),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const Text(
-                              'Total Pembayaran',
-                              style: TextStyle(fontSize: 13, color: mutedText),
-                            ),
-                            Text(
-                              formatRupiah(order.totalAmount),
-                              style: const TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.bold,
-                                color: darkGreen,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Ubah Status Pesanan',
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.bold,
-                      color: darkGreen,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: ['Baru', 'Diproses', 'Selesai'].map((status) {
-                      final active = order.status == status;
-                      return Expanded(
-                        child: Padding(
-                          padding: EdgeInsets.only(
-                            right: status != 'Selesai' ? 8 : 0,
-                          ),
-                          child: OutlinedButton(
-                            onPressed: () {
-                              AuthService.updateOrderStatus(order, status);
-                              setSheetState(() {});
-                              _notifyChanged();
-                            },
-                            style: OutlinedButton.styleFrom(
-                              backgroundColor: active ? green : Colors.white,
-                              foregroundColor: active
-                                  ? Colors.white
-                                  : darkGreen,
-                              side: BorderSide(
-                                color: active ? green : cardBorder,
-                              ),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(25),
-                              ),
-                            ),
-                            child: Text(
-                              status,
-                              style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                  const SizedBox(height: 14),
-                  SizedBox(
-                    width: double.infinity,
-                    height: 48,
-                    child: ElevatedButton.icon(
-                      onPressed: order.isPaid
-                          ? null
-                          : () {
-                              AuthService.markOrderPaid(order);
-                              setSheetState(() {});
-                              _notifyChanged();
-                              Navigator.pop(sheetContext);
-                              _showMessage(
-                                'Pesanan ${order.orderNumber} ditandai sudah dibayar.',
-                              );
-                            },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: green,
-                        foregroundColor: Colors.white,
-                        disabledBackgroundColor: const Color(0xFFE6F2EA),
-                        disabledForegroundColor: green,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(14),
-                        ),
-                      ),
-                      icon: Icon(
-                        order.isPaid
-                            ? Icons.check_circle_outline
-                            : Icons.payments_outlined,
-                        size: 20,
-                      ),
-                      label: Text(
-                        order.isPaid
-                            ? 'Pembayaran Sudah Lunas'
-                            : 'Tandai Sudah Dibayar',
-                        style: const TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            );
-          },
-        );
-      },
     );
   }
 
@@ -715,7 +548,7 @@ class _PesananScreenState extends State<PesananScreen> {
         borderRadius: BorderRadius.circular(20),
         child: InkWell(
           borderRadius: BorderRadius.circular(20),
-          onTap: () => _openOrderDetailSheet(order),
+          onTap: () => _openOrderDetail(order),
           child: Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
